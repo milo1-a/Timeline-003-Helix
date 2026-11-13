@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090909">
+  <title>Timeline 003-Helix Demonlist</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080808;
+      --panel: #101010;
+      --panel-2: #151515;
+      --line: #292929;
+      --muted: #929292;
+      --text: #f5f5f5;
+      --soft: #c9c9c9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(8,8,8,.94);
+    }
+    .nav {
+      min-height: 72px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.04em; }
+    .mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid #eee; font-size: 13px; font-weight: 900;
+    }
+    .brand span:last-child { font-size: 14px; }
+    .nav-tag { color: var(--muted); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+    main { padding: 66px 0 90px; }
+    .eyebrow { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+    h1 {
+      max-width: 850px; margin: 15px 0 14px;
+      font-size: clamp(38px, 7vw, 76px); line-height: .98;
+      letter-spacing: -.075em; font-weight: 850;
+    }
+    h1 .sub { color: #777; }
+    .intro { max-width: 590px; color: var(--muted); font-size: 15px; line-height: 1.7; }
+    .stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      margin: 42px 0 48px; border: 1px solid var(--line);
+      background: var(--line); gap: 1px;
+    }
+    .stat { background: var(--panel); padding: 20px 22px; }
+    .stat strong { display: block; font-size: 25px; letter-spacing: -.05em; }
+    .stat span { display: block; color: var(--muted); margin-top: 5px; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; }
+    .section-head {
+      display: flex; align-items: end; justify-content: space-between;
+      gap: 20px; margin-bottom: 17px;
+    }
+    h2 { margin: 0; font-size: 22px; letter-spacing: -.045em; }
+    .section-note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .tools { display: flex; gap: 10px; margin-bottom: 14px; }
+    input, select {
+      background: var(--panel); color: var(--text); border: 1px solid var(--line);
+      border-radius: 0; padding: 12px 14px; font: inherit; font-size: 13px;
+      outline: none;
+    }
+    input { flex: 1; min-width: 0; }
+    input:focus, select:focus { border-color: #aaa; }
+    .table-shell { border: 1px solid var(--line); overflow: hidden; }
+    .table-head, .level {
+      display: grid; grid-template-columns: 72px minmax(170px, 1.7fr) minmax(130px, 1fr) 140px;
+      align-items: center; gap: 16px; padding: 15px 20px;
+    }
+    .table-head {
+      background: #141414; color: #858585; font-size: 10px;
+      letter-spacing: .16em; text-transform: uppercase; font-weight: 700;
+    }
+    .level { min-height: 76px; border-top: 1px solid var(--line); transition: background .15s; }
+    .level:hover { background: #121212; }
+    .rank { color: #858585; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .level-name { font-weight: 750; letter-spacing: -.025em; font-size: 15px; }
+    .creator { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .difficulty {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #dedede; font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
+    }
+    .dot { width: 6px; height: 6px; background: #eee; display: inline-block; }
+    .status { color: #858585; font-size: 11px; text-align: right; text-transform: uppercase; letter-spacing: .1em; }
+    .empty { padding: 54px 20px; text-align: center; color: var(--muted); }
+    .empty strong { display: block; color: var(--text); margin-bottom: 8px; font-size: 15px; }
+    .foot {
+      display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      margin-top: 18px; color: #696969; font-size: 11px; line-height: 1.6;
+    }
+    footer { border-top: 1px solid var(--line); padding: 24px 0; color: #777; font-size: 11px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    @media (max-width: 650px) {
+      .wrap { width: min(100% - 28px, 1120px); }
+      main { padding-top: 48px; }
+      .stats { margin: 32px 0 40px; }
+      .stat { padding: 15px 12px; }
+      .stat strong { font-size: 21px; }
+      .stat span { font-size: 9px; letter-spacing: .1em; }
+      .table-head, .level { grid-template-columns: 42px minmax(110px, 1fr) 95px; gap: 10px; padding: 14px 12px; }
+      .table-head span:last-child, .status { display: none; }
+      .tools { flex-direction: column; }
+      .nav-tag { display: none; }
+    }
+
+    .admin { margin: 24px 0 18px; border: 1px solid var(--line); background: var(--panel); }
+    .admin summary { cursor: pointer; list-style: none; padding: 15px 18px; display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .admin summary::-webkit-details-marker { display:none; }
+    .admin summary::after { content:"+"; color:var(--muted); font-size:18px; line-height:12px; }
+    .admin[open] summary::after { content:"−"; }
+    .admin-body { border-top:1px solid var(--line); padding:18px; }
+    .admin-note { color:var(--muted); font-size:12px; line-height:1.6; margin:0 0 16px; }
+    .admin-form { display:grid; grid-template-columns:1.3fr 1fr auto; gap:9px; }
+    .admin-form button, .admin-actions button, .manage-row button { background:#eee; color:#111; border:0; padding:10px 13px; font:inherit; font-size:12px; font-weight:750; cursor:pointer; }
+    .admin-actions { display:flex; gap:8px; flex-wrap:wrap; margin:13px 0 16px; }
+    .admin-actions button.secondary, .manage-row button.secondary { background:#202020; color:#eee; border:1px solid #383838; }
+    .manage-list { display:grid; gap:6px; max-height:360px; overflow:auto; }
+    .manage-row { display:grid; grid-template-columns:42px minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px 10px; border:1px solid var(--line); }
+    .manage-rank { color:var(--muted); font-size:12px; }
+    .manage-name { font-size:13px; font-weight:700; overflow-wrap:anywhere; }
+    .manage-creator { color:var(--muted); font-size:11px; margin-top:3px; }
+    .manage-buttons { display:flex; gap:5px; }
+    .manage-row button { padding:7px 9px; }
+    .manage-row button:disabled { opacity:.3; cursor:not-allowed; }
+    .file-label { display:inline-flex; align-items:center; background:#202020; color:#eee; border:1px solid #383838; padding:10px 13px; font-size:12px; font-weight:750; cursor:pointer; }
+    .file-label input { display:none; }
+    .admin-message { min-height:18px; color:#aaa; font-size:11px; margin-top:10px; }
+    @media(max-width:650px) { .admin-form { grid-template-columns:1fr; } .manage-row { grid-template-columns:32px minmax(0,1fr); } .manage-buttons { grid-column:2; } }
+
+    .level-list { display:grid; gap:10px; }
+    .level-card {
+      display:grid; grid-template-columns:280px minmax(0,1fr); min-height:156px;
+      border:1px solid #34383f; background:#191c22; overflow:hidden;
+    }
+    .level-art { width:100%; height:100%; min-height:156px; object-fit:cover; display:block; background:#101216; }
+    .level-art-placeholder { min-height:156px; display:grid; place-items:center; color:#666; background:linear-gradient(135deg,#101216,#20242c); font-size:12px; letter-spacing:.16em; text-transform:uppercase; }
+    .level-info { padding:18px 22px 16px; min-width:0; display:flex; flex-direction:column; }
+    .level-title-row { display:flex; align-items:baseline; gap:12px; min-width:0; }
+    .level-rank { color:#4385f5; font-size:16px; font-weight:850; white-space:nowrap; }
+    .level-name { color:#f5f6f8; font-size:17px; font-weight:850; letter-spacing:-.025em; overflow-wrap:anywhere; }
+    .level-meta { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px; color:#e1e4ea; font-size:13px; font-weight:650; }
+    .level-meta .meta-item { white-space:nowrap; }
+    .level-meta .meta-item + .meta-item::before { content:"|"; color:#4f9b83; margin-right:10px; font-weight:400; }
+    .level-points { color:#6ea1ff; font-weight:500; }
+    .level-divider { border:0; border-top:1px solid #41454d; margin:14px 0 12px; }
+    .level-verified { color:#d7dbe2; font-size:13px; }
+    .level-age { color:#aeb5c1; font-size:12px; margin-top:4px; }
+    @media(max-width:700px) {
+      .level-card { grid-template-columns: minmax(0,1fr); }
+      .level-art, .level-art-placeholder { height:180px; min-height:0; }
+      .level-info { padding:15px; }
+      .level-meta { gap:6px; font-size:12px; }
+      .level-meta .meta-item + .meta-item::before { margin-right:7px; }
+    }
+
+
+    /* Infinite Demonlist-inspired front page */
+    body { background:#0b0c10; }
+    header { height:62px; border-top:2px solid #6c3338; border-bottom:1px solid #252832; background:#11141c; }
+    .nav { width:calc(100% - 48px); max-width:1170px; min-height:60px; margin:0 auto; display:grid; grid-template-columns:1fr auto 1fr; gap:18px; }
+    .brand { gap:9px; }
+    .brand .mark { width:29px; height:29px; border-radius:50%; border:0; background:#477bc7; color:#fff; font-size:13px; }
+    .brand span:last-child { font-size:14px; font-style:italic; font-weight:900; letter-spacing:-.035em; white-space:nowrap; }
+    .nav-tag { justify-self:end; color:#aeb5c4; font-size:12px; letter-spacing:.04em; }
+    .nav-center { color:#f3f4f8; font-size:clamp(18px,3vw,34px); letter-spacing:-.04em; white-space:nowrap; }
+    .nav-tabs { display:flex; align-items:center; justify-content:center; gap:5px; padding:5px; border:1px solid #292d37; border-radius:12px; background:#171a22; }
+    .nav-tab { border:0; border-radius:8px; padding:10px 15px; background:transparent; color:#aeb5c4; cursor:pointer; font:600 14px/1.1 inherit; white-space:nowrap; transition:background .15s,color .15s; }
+    .nav-tab span { display:block; margin-top:4px; color:#7f899b; font-size:10px; font-weight:500; }
+    .nav-tab:hover { color:#fff; background:#222733; }
+    .nav-tab.active { color:#fff; background:#2b303b; box-shadow:inset 0 0 0 1px #3b4352; }
+    .nav-tab.active span { color:#a9c5ff; }
+    .legacy-panel { display:none; min-height:300px; margin:22px 14px 0; border:1px solid #292d37; border-radius:14px; background:linear-gradient(145deg,#171a22,#101218); align-items:center; justify-content:center; text-align:center; padding:32px; }
+    .legacy-panel.show { display:flex; }
+    .legacy-panel strong { display:block; color:#f3f4f8; font-size:25px; letter-spacing:-.04em; }
+    .legacy-panel p { color:#929bad; margin:10px 0 0; font-size:13px; }
+    @media(max-width:760px) {
+      .nav { grid-template-columns:1fr; justify-items:center; gap:8px; padding:10px 0; }
+      header { height:auto; }
+      .nav-tag { display:none; }
+      .nav-tabs { width:100%; }
+      .nav-tab { flex:1; padding:9px 5px; font-size:12px; }
+      .nav-tab span { font-size:9px; }
+    }
+    main.wrap { width:min(790px,calc(100% - 32px)); padding:14px 0 70px; }
+    .eyebrow, h1, .intro, .stats, .section-head, .foot { display:none !important; }
+    .tools { display:grid; grid-template-columns:42px minmax(0,1fr) auto 42px; gap:10px; padding:0 14px 14px; margin:0 0 22px; border-bottom:1px solid #20232b; }
+    .tools input { height:46px; border-radius:12px; border:1px solid #292d37; background:#1a1d25; padding:0 15px; color:#eef0f5; }
+    .tools select { height:46px; border-radius:11px; background:#1a1d25; border:1px solid #292d37; }
+    .toolbar-btn { height:42px; width:42px; border:1px solid #292d37; border-radius:11px; color:#aeb5c4; background:#1a1d25; cursor:pointer; font-size:17px; }
+    .view-toggle { display:flex; gap:4px; padding:4px; border:1px solid #292d37; border-radius:12px; background:#1a1d25; }
+    .view-toggle button { width:38px; border:0; border-radius:8px; color:#aeb5c4; background:transparent; cursor:pointer; font-size:16px; }
+    .view-toggle button.active { background:#2b303b; color:#fff; }
+    .level-list { gap:10px; padding:0 14px; }
+    .level-card { grid-template-columns:280px minmax(0,1fr); min-height:156px; border:1px solid #30343d; background:#1a1d24; }
+    .level-art,.level-art-placeholder { min-height:156px; }
+    .level-info { padding:18px 22px 16px; }
+    .level-rank { color:#4d87e8; }
+    .level-meta .meta-item + .meta-item::before { color:#4b9b86; }
+    .admin { margin:18px 14px 14px; background:#141720; border-color:#2b303b; }
+    .admin-body { background:#11141b; }
+    footer { background:#0b0c10; border-color:#20232b; }
+    .footer-inner { width:min(790px,calc(100% - 32px)); }
+    .filter-panel { display:none; margin:0 14px 14px; padding:12px; border:1px solid #292d37; background:#151821; color:#cbd0dc; font-size:12px; }
+    .filter-panel.show { display:flex; align-items:center; gap:10px; }
+    .filter-panel button { background:#242a36; color:#fff; border:1px solid #394150; padding:7px 12px; border-radius:7px; cursor:pointer; }
+    .level-list.grid-view { grid-template-columns:1fr 1fr; }
+    .level-list.grid-view .level-card { grid-template-columns:1fr; }
+    .level-list.grid-view .level-art,.level-list.grid-view .level-art-placeholder { height:145px; min-height:145px; }
+    @media(max-width:700px) {
+      header { height:auto; }
+      .nav { width:calc(100% - 24px); min-height:58px; grid-template-columns:1fr auto; }
+      .nav-center { grid-column:1 / -1; grid-row:2; text-align:center; padding:0 0 10px; }
+      .nav-tag { display:none; }
+      .tools { grid-template-columns:40px minmax(0,1fr) 82px; padding-left:0; padding-right:0; }
+      .tools select { display:none; }
+      .view-toggle { grid-column:3; grid-row:1; }
+      .toolbar-btn:last-child { display:none; }
+      .level-list { padding:0; }
+      .level-card { grid-template-columns:minmax(0,1fr); }
+      .level-art,.level-art-placeholder { height:180px; min-height:0; }
+      .level-list.grid-view { grid-template-columns:1fr; }
+      .admin { margin-left:0; margin-right:0; }
+    }
+
+
+    /* Supabase admin authentication */
+    .auth-panel { margin:18px 14px 14px; padding:14px; border:1px solid #2b303b; border-radius:12px; background:#141720; }
+    .auth-row { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+    .auth-row input { min-width:160px; border-radius:8px; background:#1a1d25; border:1px solid #343b49; }
+    .auth-row button { border:0; border-radius:8px; padding:11px 15px; background:#477bc7; color:white; font-weight:750; cursor:pointer; }
+    .auth-row button.secondary { background:#242a36; border:1px solid #394150; }
+    .auth-status { color:#aeb5c4; font-size:12px; margin-top:9px; }
+    #admin-panel { display:none; } /* UI convenience only; Supabase RLS enforces authorization. */
+    @media(max-width:650px) { .auth-row { flex-direction:column; align-items:stretch; } .auth-row input { width:100%; } }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand"><span class="mark">H</span><span>TIMELINE 003-HELIX</span></div>
+      <nav class="nav-center nav-tabs" aria-label="Demonlist sections">
+        <button class="nav-tab active" type="button" data-tab="main" aria-pressed="true">Main <span>#1–75</span></button>
+        <button class="nav-tab" type="button" data-tab="extended" aria-pressed="false">Extended <span>#76–150</span></button>
+        <button class="nav-tab" type="button" data-tab="legacy" aria-pressed="false">Legacy</button>
+      </nav>
+      <div class="nav-tag">◐ &nbsp; ENGLISH &nbsp; ⚙</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tools">
+      <button class="toolbar-btn" id="filter-toggle" type="button" aria-label="Show filters">☷</button>
+      <input id="search" type="search" placeholder="Search..." aria-label="Search levels or creators">
+      <div class="view-toggle" aria-label="View mode">
+        <button class="active" id="list-view" type="button" aria-label="List view">☰</button>
+        <button id="grid-view" type="button" aria-label="Grid view">▦</button>
+      </div>
+      <button class="toolbar-btn" id="sort-toggle" type="button" aria-label="Sort rankings">◷</button>
+      <select id="sort" aria-label="Sort list" style="display:none">
+        <option value="rank">Rank: hardest first</option>
+        <option value="name">Name: A–Z</option>
+      </select>
+    </div>
+    <div class="legacy-panel" id="legacy-panel" role="status">
+      <div><strong>Work in Progress</strong><p>The Legacy Demonlist is currently being prepared.</p></div>
+    </div>
+    <div class="filter-panel" id="filter-panel">
+      <span>Show:</span><button type="button" id="all-levels">All levels</button><button type="button" id="ranked-levels">Ranked</button><button type="button" id="placeholder-levels">Placeholders</button>
+    </div>
+    <section aria-label="Extreme Demon rankings">
+      <span id="total-count" hidden>150</span>
+
+      <section class="auth-panel" aria-label="Administrator sign in">
+        <form class="auth-row" id="admin-login-form">
+          <input id="admin-password" type="password" autocomplete="current-password" required placeholder="Admin password" aria-label="Admin password">
+          <button type="submit" id="admin-login-button">Unlock admin tools</button>
+          <button type="button" class="secondary" id="admin-logout-button" hidden>Log out</button>
+        </form>
+        <div class="auth-status" id="auth-status" role="status">Sign in with the authorized administrator account to manage the list.</div>
+      </section>
+      <details class="admin" id="admin-panel">
+        <summary>List management · Admin tools</summary>
+        <div class="admin-body">
+          <p class="admin-note">Add demons with artwork, creator, verifier, record holder, points, and verification date; reorder or remove entries below. Changes are saved in this browser. Use Export backup to keep a copy of your list.</p>
+          <form class="admin-form" id="add-form">
+            <input id="new-name" required maxlength="90" placeholder="Demon name" aria-label="Demon name">
+            <input id="new-creator" maxlength="70" placeholder="Creator" aria-label="Creator">
+            <input id="new-verifier" maxlength="70" placeholder="Verifier" aria-label="Verifier">
+            <input id="new-publisher" maxlength="70" placeholder="Publisher / record holder" aria-label="Publisher or record holder">
+            <input id="new-points" type="number" min="0" placeholder="Points (e.g. 10000)" aria-label="Points">
+            <input id="new-image" type="url" placeholder="Level image URL (https://...)" aria-label="Level image URL">
+            <input id="new-verified" type="text" placeholder="Verified date (e.g. Oct 4, 2026, 08:51 PM)" aria-label="Verified date">
+            <button type="submit">Add level</button>
+          </form>
+          <div class="admin-actions">
+            <button type="button" id="export-data">Export backup</button>
+            <label class="file-label">Import backup<input type="file" id="import-data" accept="application/json,.json"></label>
+            <button type="button" class="secondary" id="reset-data">Reset 150 placeholders</button>
+          </div>
+          <div class="manage-list" id="manage-list"></div>
+          <div class="admin-message" id="admin-message" aria-live="polite"></div>
+        </div>
+      </details>
+      <div class="level-list" id="levels"></div>
+      <div class="foot">
+        <span>Only Extreme Demons are eligible for this list.</span>
+        <span>Unofficial community project · Not affiliated with RobTop Games</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>© 2026 TIMELINE 003 — HELIX DEMONLIST</span>
+      <span>BUILT FOR THE COMMUNITY</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Supabase configuration: replace these two public project values before publishing.
+    // The anon key is designed to be public; database Row Level Security protects writes.
+    const SUPABASE_URL = "https://hhvakzojalujlmacxgmm.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhodmFrem9qYWx1amxtYWN4Z21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2MDIwNDcsImV4cCI6MjExMDE3ODA0N30.nqgT3FySPxB5pBjX3O5Mp1NrMRSZsojXn11ynRNiHRo";
+    // Internal Supabase Auth account email. This is NOT shown on the login screen.
+    // Create this user in Supabase Authentication and use the same email here and in SQL.
+    const ADMIN_EMAIL = "tubbyc493@gmail.com";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const makePlaceholders = () => Array.from({ length: 150 }, (_, index) => ({
+      rank: index + 1,
+      name: `Level ${String(index + 1).padStart(3, "0")} — Add demon name`,
+      creator: "Add creator",
+      verifier: "Add verifier",
+      publisher: "Add record holder",
+      points: 10000,
+      imageUrl: "",
+      verified: "Not verified yet",
+      status: "Placeholder"
+    }));
+
+    let levels = makePlaceholders();
+    let currentUser = null;
+    let isAdmin = false;
+
+    async function loadLevels() {
+      const { data, error } = await supabaseClient
+        .from("demonlist_data")
+        .select("levels")
+        .eq("id", 1)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Could not load the shared demonlist:", error);
+        document.getElementById("auth-status").textContent =
+          "Could not connect to the shared list. Check your Supabase setup.";
+        return;
+      }
+      if (data && Array.isArray(data.levels)) {
+        levels = data.levels;
+      } else {
+        levels = makePlaceholders();
+      }
+      render();
+      renderManager();
+    }
+    async function saveLevels() {
+      if (!isAdmin) {
+        document.getElementById("admin-message").textContent = "You are not authorized to make changes.";
+        return;
+      }
+      levels = levels.map((level, index) => ({ ...level, rank: index + 1 }));
+      const { error } = await supabaseClient
+        .from("demonlist_data")
+        .upsert({ id: 1, levels }, { onConflict: "id" });
+
+      if (error) {
+        console.error("Could not save the shared demonlist:", error);
+        document.getElementById("admin-message").textContent =
+          "Save failed. Check your admin account and Supabase database policies.";
+        return;
+      }
+      document.getElementById("admin-message").textContent = "Saved to the shared demonlist.";
+      render();
+      renderManager();
+    }
+
+    const container = document.getElementById("levels");
+    const search = document.getElementById("search");
+    const sort = document.getElementById("sort");
+    const count = document.getElementById("total-count");
+
+    function render() {
+      const query = search.value.trim().toLowerCase();
+      const visible = levels
+        .filter(level => `${level.name} ${level.creator} ${level.verifier || ""} ${level.publisher || ""}`.toLowerCase().includes(query))
+        .filter(level => statusFilter === "all" || (statusFilter === "placeholder" ? level.status === "Placeholder" : level.status !== "Placeholder"))
+        .filter(level => currentTab === "extended" ? level.rank >= 76 && level.rank <= 150 : level.rank >= 1 && level.rank <= 75)
+        .sort((a, b) => sort.value === "name"
+          ? a.name.localeCompare(b.name)
+          : a.rank - b.rank);
+
+      count.textContent = levels.length;
+      if (!visible.length) {
+        container.innerHTML = '<div class="empty"><strong>No matching levels</strong>Try another search.</div>';
+        return;
+      }
+      container.innerHTML = visible.map(level => {
+        const imageUrl = typeof level.imageUrl === "string" && /^https?:\/\//i.test(level.imageUrl) ? level.imageUrl : "";
+        const meta = [level.creator, level.verifier, level.publisher].filter(value => value && value !== "Add creator" && value !== "Add verifier" && value !== "Add record holder");
+        const verified = level.verified || "Not verified yet";
+        return `
+          <article class="level-card">
+            ${imageUrl ? `<img class="level-art" src="${escapeHTML(imageUrl)}" alt="${escapeHTML(level.name)} level artwork" loading="lazy" onerror="this.outerHTML='<div class=\'level-art-placeholder\'>Level artwork</div>'">` : `<div class="level-art-placeholder">Level artwork</div>`}
+            <div class="level-info">
+              <div class="level-title-row"><span class="level-rank">#${level.rank}</span><span class="level-name">${escapeHTML(level.name)}</span></div>
+              <div class="level-meta">${meta.map(item => `<span class="meta-item">${escapeHTML(item)}</span>`).join("")}<span class="level-points">· ${escapeHTML(String(level.points ?? 10000))} Points</span></div>
+              <hr class="level-divider">
+              <div class="level-verified">Verified: ${escapeHTML(verified)}</div>
+              <div class="level-age">${escapeHTML(level.status || "Ranked")}</div>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+    }
+
+    const manager = document.getElementById("manage-list");
+    function renderManager() {
+      manager.innerHTML = levels.map((level, index) => `
+        <div class="manage-row">
+          <div class="manage-rank">#${index + 1}</div>
+          <div><div class="manage-name">${escapeHTML(level.name)}</div><div class="manage-creator">${escapeHTML(level.creator || "Creator not set")}</div></div>
+          <div class="manage-buttons">
+            <button class="secondary" type="button" data-up="${index}" aria-label="Move ${escapeHTML(level.name)} up" ${index === 0 ? "disabled" : ""}>↑</button>
+            <button class="secondary" type="button" data-down="${index}" aria-label="Move ${escapeHTML(level.name)} down" ${index === levels.length - 1 ? "disabled" : ""}>↓</button>
+            <button class="secondary" type="button" data-delete="${index}" aria-label="Delete ${escapeHTML(level.name)}">Delete</button>
+          </div>
+        </div>`).join("");
+    }
+
+    document.getElementById("add-form").addEventListener("submit", event => {
+      if (!isAdmin) return;
+      event.preventDefault();
+      const name = document.getElementById("new-name").value.trim();
+      const creator = document.getElementById("new-creator").value.trim() || "Unknown";
+      const verifier = document.getElementById("new-verifier").value.trim();
+      const publisher = document.getElementById("new-publisher").value.trim();
+      const points = Number(document.getElementById("new-points").value || 10000);
+      const imageUrl = document.getElementById("new-image").value.trim();
+      const verified = document.getElementById("new-verified").value.trim() || "Not verified yet";
+      if (!name) return;
+      levels.push({ rank: levels.length + 1, name, creator, verifier, publisher, points, imageUrl, verified, status: "Ranked" });
+      event.target.reset();
+      saveLevels();
+    });
+
+    manager.addEventListener("click", event => {
+      if (!isAdmin) return;
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.dataset.up !== undefined) {
+        const i = Number(button.dataset.up);
+        if (i > 0) [levels[i - 1], levels[i]] = [levels[i], levels[i - 1]];
+        saveLevels();
+      } else if (button.dataset.down !== undefined) {
+        const i = Number(button.dataset.down);
+        if (i < levels.length - 1) [levels[i + 1], levels[i]] = [levels[i], levels[i + 1]];
+        saveLevels();
+      } else if (button.dataset.delete !== undefined) {
+        const i = Number(button.dataset.delete);
+        const removed = levels[i];
+        if (confirm(`Remove "${removed.name}" from the list?`)) {
+          levels.splice(i, 1);
+          saveLevels();
+        }
+      }
+    });
+
+    document.getElementById("export-data").addEventListener("click", () => {
+      if (!isAdmin) return;
+      const blob = new Blob([JSON.stringify(levels, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "timeline-003-helix-backup.json";
+      link.click();
+      URL.revokeObjectURL(url);
+      document.getElementById("admin-message").textContent = "Backup downloaded.";
+    });
+
+    document.getElementById("import-data").addEventListener("change", async event => {
+      if (!isAdmin) { event.target.value = ""; return; }
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const imported = JSON.parse(await file.text());
+        if (!Array.isArray(imported) || !imported.every(item => item && typeof item.name === "string" && typeof item.creator === "string")) {
+          throw new Error("Invalid backup format");
+        }
+        levels = imported.map((item, index) => ({
+          ...item, rank: index + 1, name: item.name, creator: item.creator,
+          status: typeof item.status === "string" ? item.status : "Ranked"
+        }));
+        saveLevels();
+        document.getElementById("admin-message").textContent = "Backup imported successfully.";
+      } catch (error) {
+        document.getElementById("admin-message").textContent = "That file could not be imported. Choose a Timeline 003-Helix JSON backup.";
+      }
+      event.target.value = "";
+    });
+
+    document.getElementById("reset-data").addEventListener("click", () => {
+      if (!isAdmin) return;
+      if (confirm("Reset the list to 150 blank placeholder entries? This replaces the saved list in this browser.")) {
+        levels = makePlaceholders();
+        saveLevels();
+      }
+    });
+
+    let statusFilter = "all";
+    let currentTab = "main";
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll(".nav-tab").forEach(button => {
+        const active = button.dataset.tab === tab;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      const isLegacy = tab === "legacy";
+      document.querySelector(".tools").style.display = isLegacy ? "none" : "";
+      document.getElementById("filter-panel").style.display = isLegacy ? "none" : "";
+      document.querySelector(".admin").style.display = isLegacy ? "none" : "";
+      document.getElementById("levels").style.display = isLegacy ? "none" : "";
+      document.querySelector(".legacy-panel").classList.toggle("show", isLegacy);
+      if (!isLegacy) render();
+    }
+
+    document.querySelectorAll(".nav-tab").forEach(button => {
+      button.addEventListener("click", () => setTab(button.dataset.tab));
+    });
+
+    search.addEventListener("input", render);
+    sort.addEventListener("change", render);
+    document.getElementById("filter-toggle").addEventListener("click", () => document.getElementById("filter-panel").classList.toggle("show"));
+    document.getElementById("sort-toggle").addEventListener("click", () => { sort.value = sort.value === "rank" ? "name" : "rank"; render(); });
+    document.getElementById("list-view").addEventListener("click", () => { container.classList.remove("grid-view"); document.getElementById("list-view").classList.add("active"); document.getElementById("grid-view").classList.remove("active"); });
+    document.getElementById("grid-view").addEventListener("click", () => { container.classList.add("grid-view"); document.getElementById("grid-view").classList.add("active"); document.getElementById("list-view").classList.remove("active"); });
+    document.getElementById("all-levels").addEventListener("click", () => { statusFilter = "all"; render(); });
+    document.getElementById("ranked-levels").addEventListener("click", () => { statusFilter = "ranked"; render(); });
+    document.getElementById("placeholder-levels").addEventListener("click", () => { statusFilter = "placeholder"; render(); });
+    const authStatus = document.getElementById("auth-status");
+    const loginForm = document.getElementById("admin-login-form");
+    const logoutButton = document.getElementById("admin-logout-button");
+    const adminPanel = document.getElementById("admin-panel");
+
+    function updateAdminUI(user) {
+      currentUser = user || null;
+      isAdmin = !!(currentUser && currentUser.email &&
+        currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
+        ADMIN_EMAIL !== "REPLACE_WITH_YOUR_ADMIN_ACCOUNT_EMAIL");
+
+      adminPanel.style.display = isAdmin ? "" : "none";
+      document.getElementById("admin-login-button").hidden = !!currentUser;
+      document.getElementById("admin-password").hidden = !!currentUser;
+      logoutButton.hidden = !currentUser;
+
+      if (isAdmin) {
+        authStatus.textContent = "Signed in as administrator. You can manage the shared list.";
+        renderManager();
+      } else if (currentUser) {
+        authStatus.textContent = "Signed in, but this account is not authorized to manage the list.";
+      } else {
+        authStatus.textContent = "Enter the private administrator password to manage the list.";
+      }
+    }
+
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const password = document.getElementById("admin-password").value;
+      authStatus.textContent = "Checking admin password…";
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password
+      });
+      if (error) {
+        authStatus.textContent = "Login failed. Check your email and password.";
+        return;
+      }
+      updateAdminUI(data.user);
+      document.getElementById("admin-password").value = "";
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        authStatus.textContent = "Could not log out. Please try again.";
+        return;
+      }
+      updateAdminUI(null);
+    });
+
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      updateAdminUI(session ? session.user : null);
+    });
+
+    async function initializePage() {
+      const { data } = await supabaseClient.auth.getSession();
+      updateAdminUI(data.session ? data.session.user : null);
+      await loadLevels();
+      render();
+      if (isAdmin) renderManager();
+    }
+
+    initializePage();
+  </script>
+</body>
+</html>
