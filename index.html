@@ -367,10 +367,24 @@
           "Could not connect to the shared list. Check your Supabase setup.";
         return;
       }
-      if (data && Array.isArray(data.levels)) {
+      if (data && Array.isArray(data.levels) && data.levels.length > 0) {
         levels = data.levels;
       } else {
+        // An empty database row should become the initial 150 placeholders.
         levels = makePlaceholders();
+        if (isAdmin) {
+          const { error: seedError } = await supabaseClient
+            .from("demonlist_data")
+            .upsert({ id: 1, levels }, { onConflict: "id" });
+          if (seedError) {
+            console.error("Could not initialize placeholder levels:", seedError);
+            document.getElementById("auth-status").textContent =
+              "Signed in, but the placeholder list could not be saved. Check the Supabase admin email policy.";
+          } else {
+            document.getElementById("auth-status").textContent =
+              "Signed in as administrator. Your 150 placeholder levels have been created.";
+          }
+        }
       }
       render();
       renderManager();
@@ -576,7 +590,8 @@
         currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
         ADMIN_EMAIL !== "REPLACE_WITH_YOUR_ADMIN_ACCOUNT_EMAIL");
 
-      adminPanel.style.display = isAdmin ? "" : "none";
+      adminPanel.style.display = isAdmin ? "block" : "none";
+      adminPanel.open = isAdmin;
       document.getElementById("admin-login-button").hidden = !!currentUser;
       document.getElementById("admin-password").hidden = !!currentUser;
       logoutButton.hidden = !currentUser;
